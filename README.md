@@ -58,7 +58,7 @@ My `~/.extra` looks something like this:
 GIT_AUTHOR_NAME="Rana Amrit Parth"
 GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 git config --global user.name "$GIT_AUTHOR_NAME"
-GIT_AUTHOR_EMAIL="ranaparth@gmail.com"
+GIT_AUTHOR_EMAIL="ramrit9@gmail.com"
 GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 git config --global user.email "$GIT_AUTHOR_EMAIL"
 ```
