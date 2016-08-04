@@ -1,5 +1,7 @@
-//Download and install Sublime Text Package Manager
-//Using Package Manager Install Emmet, Material Theme, Matherial App Bar, Side Bar Enhancement.
+// Download and install Sublime Text Package Control
+// Using Package Manager Install Emmet, Material Theme, Matherial App Bar, Side Bar Enhancement
+// Also Sublime Linter and language specific linter packages
+// BracketHighliter, GitGutter
 {
 	"always_show_minimap_viewport": true,
 	"bold_folder_labels": true,
@@ -42,11 +44,16 @@
 		"draw_normal",
 		"draw_active"
 	],
-	"line_padding_bottom": 5,
+	"line_padding_bottom": 3,
 	"line_padding_top": 3,
 	"match_brackets": true,
 	"match_brackets_angle": true,
+	"material_theme_accent_sky": true,
+	"material_theme_appbar_green": true,
+	"material_theme_bold_tab": true,
+	"material_theme_compact_sidebar": true,
 	"material_theme_contrast_mode": true,
+	"material_theme_tabs_autowidth": true,
 	"material_theme_tree_headings": true,
 	"overlay_scroll_bars": "enabled",
 	"remember_open_files": false,
