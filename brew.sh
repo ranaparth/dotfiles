@@ -136,10 +136,6 @@ brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew install zsh-completions
 
-# Install modern version managers
-brew install fnm  # Fast Node Manager
-brew install pyenv  # Python version management
-
 # Python development tools
 brew install black  # Code formatter
 brew install flake8  # Linting

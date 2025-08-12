@@ -148,7 +148,7 @@ if command -v brew &> /dev/null; then
     if [[ -d $(brew --prefix)/share/zsh-completions ]]; then
         fpath=($(brew --prefix)/share/zsh-completions $fpath)
     fi
-    
+
     # Reload completions
     autoload -U compinit
     compinit
@@ -158,7 +158,7 @@ fi
 if command -v fzf &> /dev/null; then
     # Custom fzf options
     export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-    
+
     # Use ripgrep if available
     if command -v rg &> /dev/null; then
         export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
@@ -177,14 +177,6 @@ fi
 # fnm (Node.js version manager)
 if command -v fnm &> /dev/null; then
     eval "$(fnm env --use-on-cd)"
-fi
-
-# pyenv (Python version manager)
-if command -v pyenv &> /dev/null; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
 fi
 
 # Add Homebrew Python to PATH

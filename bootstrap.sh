@@ -17,10 +17,11 @@ function doIt() {
 	source ~/.zshrc;
 }
 
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
+if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
 	doIt;
 else
-	read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;
+	echo -n "This may overwrite existing files in your home directory. Are you sure? (y/n) "
+	read -r REPLY
 	echo "";
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
 		doIt;
