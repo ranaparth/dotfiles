@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
-# Extra many types of compressed packages
-# Credit: http://nparikh.org/notes/zshrc.txt
-extract() {
+# Note: The extract function is now provided by oh-my-zsh extract plugin
+# Keeping this as backup/reference but the plugin version will be used
+extract_backup() {
   if [ -f "$1" ]; then
     case "$1" in
       *.tar.bz2)  tar -jxvf "$1"                        ;;
@@ -48,9 +48,8 @@ function fs() {
 function server() {
 	local port="${1:-8000}";
 	sleep 1 && open "http://localhost:${port}/" &
-	# Set the default Content-Type to `text/plain` instead of `application/octet-stream`
-	# And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-	python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port";
+	# Use Python 3's built-in server (Python 2 is deprecated)
+	python3 -m http.server "$port";
 }
 
 # Start a PHP server from a directory, optionally specifying the port
@@ -72,8 +71,18 @@ function s() {
 	fi;
 }
 
-# `a` with no arguments opens the current directory in Atom Editor, otherwise
+# `code` with no arguments opens the current directory in VS Code, otherwise
 # opens the given location
+function c() {
+	if [ $# -eq 0 ]; then
+		code .;
+	else
+		code "$@";
+	fi;
+}
+
+# `a` with no arguments opens the current directory in Atom Editor, otherwise
+# opens the given location (keeping for backwards compatibility)
 function a() {
 	if [ $# -eq 0 ]; then
 		atom .;

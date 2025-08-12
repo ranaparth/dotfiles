@@ -7,12 +7,14 @@ git pull origin master;
 function doIt() {
 	rsync --exclude ".git/" \
 		--exclude ".DS_Store" \
-		--exclude ".osx" \
 		--exclude "bootstrap.sh" \
 		--exclude "README.md" \
 		--exclude "LICENSE-MIT.txt" \
+		--exclude "CLAUDE.md" \
 		-avh --no-perms . ~;
-	source ~/.bash_profile;
+	
+	# Source zsh configuration (we're zsh-only now)
+	source ~/.zshrc;
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then

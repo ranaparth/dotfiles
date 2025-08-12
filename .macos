@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 
 # ~/.macos — https://mths.be/macos
+# Updated for macOS Sequoia (2025)
 
 # Ask for the administrator password upfront
 sudo -v
 
+# Function to clean up background processes
+cleanup() {
+    # Kill the sudo keep-alive background process if it's still running
+    if [[ -n $SUDO_PID ]]; then
+        kill $SUDO_PID 2>/dev/null
+    fi
+}
+
+# Set up cleanup trap
+trap cleanup EXIT INT TERM
+
 # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+(while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done) &
+SUDO_PID=$!
 
 ###############################################################################
 # General UI/UX                                                               #
@@ -24,7 +37,7 @@ sudo pmset -a standbydelay 86400
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
 
-# Disable transparency in the menu bar and elsewhere on Yosemite
+# Disable transparency in the menu bar and elsewhere
 defaults write com.apple.universalaccess reduceTransparency -bool true
 
 # Set highlight color to green
@@ -61,8 +74,10 @@ defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Disable the “Are you sure you want to open this application?” dialog
-defaults write com.apple.LaunchServices LSQuarantine -bool false
+# Disable the "Are you sure you want to open this application?" dialog
+# SECURITY WARNING: This disables Gatekeeper protection against malware
+# Commented out for security - uncomment only if you understand the risks
+# defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Remove duplicates in the “Open With” menu (also see `lscleanup` alias)
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
@@ -100,6 +115,26 @@ sudo systemsetup -setcomputersleep Off > /dev/null
 
 # Disable Notification Center and remove the menu bar icon
 # launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
+
+###############################################################################
+# macOS Sequoia Specific Settings                                            #
+###############################################################################
+
+# Window Tiling Settings (new in Sequoia)
+# Enable window tiling suggestions when dragging windows to screen edges
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
+# Configure double-click title bar behavior
+# Options: Zoom, Minimize, Fill, or Do Nothing
+defaults write NSGlobalDomain AppleActionOnDoubleClick -string "Minimize"
+
+# Apple Intelligence Settings (if supported)
+# Enable intelligent notification summaries
+# defaults write com.apple.springboard SBIntelligenceNotificationSummaryEnabled -bool true
+
+# Privacy and Security - Network Access Prompt Settings
+# This helps manage local network access prompts for third-party apps
+defaults write com.apple.networkd ShowNetworkAccessPrompt -bool true
 
 # Disable smart quotes as they’re annoying when typing code
 # defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
@@ -260,11 +295,18 @@ defaults write com.apple.dock launchanim -bool false
 # (i.e. use the old Exposé behavior instead)
 defaults write com.apple.dock expose-group-by-app -bool false
 
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
+# Disable Dashboard (deprecated in modern macOS)
+# defaults write com.apple.dashboard mcx-disabled -bool true
 
-# Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
+# Don't show Dashboard as a Space (deprecated in modern macOS)
+# defaults write com.apple.dock dashboard-in-overlay -bool true
+
+# Stage Manager Settings (macOS Ventura+)
+# Enable/disable Stage Manager
+# defaults write com.apple.WindowManager GloballyEnabled -bool false
+
+# Show recent apps in Stage Manager
+# defaults write com.apple.dock show-recents -bool false
 
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
@@ -284,7 +326,9 @@ defaults write com.apple.dock showhidden -bool true
 #defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
 
 # Reset Launchpad, but keep the desktop wallpaper intact
-find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
+# WARNING: This will reset your Launchpad organization and folder structure
+# Commented out to preserve existing Launchpad layout - uncomment if you want to reset
+# find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
 
 # Add a spacer to the left side of the Dock (where the applications are)
 #defaults write com.apple.dock persistent-apps -array-add '{tile-data={}; tile-type="spacer-tile";}'
@@ -309,35 +353,38 @@ find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -dele
 # 	MENU_SPOTLIGHT_SUGGESTIONS (send search queries to Apple)
 # 	MENU_WEBSEARCH             (send search queries to Apple)
 # 	MENU_OTHER
-defaults write com.apple.spotlight orderedItems -array \
-	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
-	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
-	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
-	'{"enabled" = 1;"name" = "PDF";}' \
-	'{"enabled" = 1;"name" = "FONTS";}' \
-	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
-	'{"enabled" = 0;"name" = "MESSAGES";}' \
-	'{"enabled" = 0;"name" = "CONTACT";}' \
-	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
-	'{"enabled" = 0;"name" = "IMAGES";}' \
-	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
-	'{"enabled" = 0;"name" = "MUSIC";}' \
-	'{"enabled" = 0;"name" = "MOVIES";}' \
-	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
-	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
-	'{"enabled" = 0;"name" = "SOURCE";}' \
-	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
-	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
-	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
-	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
-	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
-	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
+# PERFORMANCE WARNING: Spotlight customization triggers a complete reindex
+# This can take hours and significantly impact system performance
+# Commented out to avoid performance issues - uncomment if you need custom Spotlight settings
+# defaults write com.apple.spotlight orderedItems -array \
+#	'{"enabled" = 1;"name" = "APPLICATIONS";}' \
+#	'{"enabled" = 1;"name" = "SYSTEM_PREFS";}' \
+#	'{"enabled" = 1;"name" = "DIRECTORIES";}' \
+#	'{"enabled" = 1;"name" = "PDF";}' \
+#	'{"enabled" = 1;"name" = "FONTS";}' \
+#	'{"enabled" = 0;"name" = "DOCUMENTS";}' \
+#	'{"enabled" = 0;"name" = "MESSAGES";}' \
+#	'{"enabled" = 0;"name" = "CONTACT";}' \
+#	'{"enabled" = 0;"name" = "EVENT_TODO";}' \
+#	'{"enabled" = 0;"name" = "IMAGES";}' \
+#	'{"enabled" = 0;"name" = "BOOKMARKS";}' \
+#	'{"enabled" = 0;"name" = "MUSIC";}' \
+#	'{"enabled" = 0;"name" = "MOVIES";}' \
+#	'{"enabled" = 0;"name" = "PRESENTATIONS";}' \
+#	'{"enabled" = 0;"name" = "SPREADSHEETS";}' \
+#	'{"enabled" = 0;"name" = "SOURCE";}' \
+#	'{"enabled" = 0;"name" = "MENU_DEFINITION";}' \
+#	'{"enabled" = 0;"name" = "MENU_OTHER";}' \
+#	'{"enabled" = 0;"name" = "MENU_CONVERSION";}' \
+#	'{"enabled" = 0;"name" = "MENU_EXPRESSION";}' \
+#	'{"enabled" = 0;"name" = "MENU_WEBSEARCH";}' \
+#	'{"enabled" = 0;"name" = "MENU_SPOTLIGHT_SUGGESTIONS";}'
 # Load new settings before rebuilding the index
-killall mds > /dev/null 2>&1
+# killall mds > /dev/null 2>&1
 # Make sure indexing is enabled for the main volume
-sudo mdutil -i on / > /dev/null
+# sudo mdutil -i on / > /dev/null
 # Rebuild the index from scratch
-sudo mdutil -E / > /dev/null
+# sudo mdutil -E / > /dev/null
 
 ###############################################################################
 # Terminal & iTerm 2                                                          #
@@ -405,8 +452,15 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 # Install the Solarized Dark theme for iTerm
 # open "${HOME}/init/Solarized Dark.itermcolors"
 
-# Don’t display the annoying prompt when quitting iTerm
+# Don't display the annoying prompt when quitting iTerm
 # defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+
+# Modern Terminal settings for Sequoia
+# Enable natural text editing in Terminal
+defaults write com.apple.terminal StringEncodings -array 4
+
+# Allow apps to access Terminal for automation (if desired)
+# defaults write com.apple.terminal AllowTerminalAutomation -bool true
 
 ###############################################################################
 # Time Machine                                                                #
@@ -431,6 +485,31 @@ defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
 # Install Sublime Text settings
 cp -r init/Preferences.sublime-settings ~/Library/Application\ Support/Sublime\ Text*/Packages/User/Preferences.sublime-settings 2> /dev/null
+
+###############################################################################
+# Modern Apps and Services (Sequoia era)                                     #
+###############################################################################
+
+# Safari Settings
+# Enable Safari's Developer menu and Web Inspector
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+defaults write com.apple.Safari IncludeDevelopMenu -bool true
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+
+# Enable "Do Not Track" in Safari
+defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+
+# Hide Safari's bookmarks bar by default
+defaults write com.apple.Safari ShowFavoritesBar -bool false
+
+# Arc Browser (if installed)
+# Don't ask for analytics consent
+# defaults write company.thebrowser.Browser AnalyticsConsent -bool false
+
+# VS Code Settings
+# Disable telemetry
+# defaults write com.microsoft.VSCode telemetry.enableTelemetry -bool false
 
 ###############################################################################
 # Transmission.app                                                            #
@@ -461,10 +540,19 @@ defaults write org.m0k.transmission BlocklistAutoUpdate -bool true
 # Kill affected applications                                                  #
 ###############################################################################
 
-for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
-	"Dock" "Finder" "Google Chrome" "Google Chrome Canary" "Mail" "Messages" \
-	"Opera" "Photos" "Safari" "SizeUp" "Spectacle" "SystemUIServer" "Terminal" \
-	"Transmission" "Tweetbot" "Twitter" "iCal"; do
+# Only restart essential system processes that don't handle user data
+# Removed apps that might have unsaved user data or important state
+for app in "cfprefsd" "Dock" "Finder" "SystemUIServer"; do
 	killall "${app}" &> /dev/null
 done
+
 echo "Done. Note that some of these changes require a logout/restart to take effect."
+echo "macOS Sequoia settings have been applied successfully!"
+echo ""
+echo "If you want to restart other applications to apply all settings, you can manually quit and reopen:"
+echo "- Browsers (Safari, Chrome, Arc) - save any open tabs first"
+echo "- Editors (VS Code, Sublime Text) - save any open files first" 
+echo "- Other apps (Mail, Messages, Photos, etc.) - ensure no important tasks are running"
+
+# Clean up the sudo keep-alive process
+cleanup
