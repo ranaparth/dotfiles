@@ -136,6 +136,16 @@ brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew install zsh-completions
 
+# Install miniconda for Python package and environment management
+brew install --cask miniconda
+
+# Initialize conda (add to shell path)
+if [ -f "$HOME/miniconda3/bin/conda" ]; then
+    echo "Initializing conda for current shell..."
+    "$HOME/miniconda3/bin/conda" init "$(basename "${SHELL}")"
+    echo "Conda initialized. You may need to restart your shell or run 'source ~/.zshrc'"
+fi
+
 # Python development tools
 brew install black  # Code formatter
 brew install flake8  # Linting
